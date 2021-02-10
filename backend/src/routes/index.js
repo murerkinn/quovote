@@ -3,11 +3,19 @@ const router = express.Router()
 const Event = require('../models/event')
 const Singularity = require('../models/singularity')
 const socketServer = require('../socket-connection')
-const ensureSingularity = require('../lib/ensureSingularity')
 const ObjectId = require('mongoose').Types.ObjectId
-const { v4: uuid } = require('uuid')
 const { celebrate, Joi, Segments } = require('celebrate')
 const sanitize = require('express-mongo-sanitize').sanitize;
+const { v4: uuid } = require('uuid')
+const ensureSingularity = require('../lib/ensureSingularity')
+
+async function fetchUserIdsBySingularities({ sessionId, userId, computerId }) {
+  return Singularity.find({
+    $or: [{ sessionId }, { userId }, { computerId }],
+  })
+    .select('-_id userId')
+    .distinct('userId')
+}
 
 async function ensureUser(req, res, next) {
   if (req.body.computerId) req.session.computerId = req.body.computerId
@@ -31,14 +39,6 @@ async function ensureUser(req, res, next) {
   })
 
   next()
-}
-
-async function fetchUserIdsBySingularities({ sessionId, userId, computerId }) {
-  return Singularity.find({
-    $or: [{ sessionId }, { userId }, { computerId }],
-  })
-    .select('-_id userId')
-    .distinct('userId')
 }
 
 router.param('eventId', async function ensureEvent(req, res, next) {

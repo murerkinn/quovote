@@ -1,6 +1,7 @@
 import axios from 'axios'
 import biri from 'biri'
 
+
 const mutations = {
   SET_COMPUTER_ID: 'setComputerId',
   SET_USER: 'setUser'
@@ -12,6 +13,7 @@ const actions = {
   LOGIN: 'login',
   LOGOUT: 'logout',
   FETCH_SESSION: 'fetchSession',
+  UPDATE_DIRECTOR: 'updateDirector',
   INIT: 'init'
 }
 
@@ -64,6 +66,9 @@ const account = {
       const user = await axios.get('/account/session')
 
       commit(mutations.SET_USER, user.data)
+    },
+    async [actions.UPDATE_DIRECTOR]({ commit }, director) {
+      await axios.patch('/account', { director })
     }
   }
 }

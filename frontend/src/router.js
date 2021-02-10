@@ -60,7 +60,11 @@ export default function init(store) {
       {
         path: '/events/:eventId/monitor',
         name: 'monitor',
-        component: Monitor
+        component: Monitor,
+        beforeEnter(to, from, next) {
+          if (store.state.account.user._id == store.state.event.event.owner) return next('/dashboard')
+          return next()
+        }
       },
       {
         path: '/about',

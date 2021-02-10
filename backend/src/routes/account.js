@@ -1,15 +1,26 @@
 const express = require('express')
 const passport = require('passport')
 const Validator = require('async-validator').default
-
 const User = require('../models/user')
-
 const ensureSingularity = require('../lib/ensureSingularity')
-
 const router = express.Router()
 
 router.get('/', async (req, res) => {
   res.send(req.user)
+})
+
+router.patch('/', async (req, res, next) => {
+  if (!req.user) return
+
+  const { director } = req.body
+
+  if (!director) res.sendStatus(400)
+
+  const user = await User.findByIdAndUpdate(req.session.userId, { director })
+
+  req.session.user = user
+
+  res.status(204).send(req.user)
 })
 
 router.post('/register', async (req, res, next) => {

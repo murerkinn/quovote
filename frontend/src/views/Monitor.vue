@@ -30,6 +30,19 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.monitor {
+  header,
+  footer {
+    display: none;
+  }
+
+  .ant-layout-content {
+    max-width: unset;
+  }
+}
+</style>
+
 <style lang="scss" scoped>
 .display-frame {
   padding: 20px 30px;

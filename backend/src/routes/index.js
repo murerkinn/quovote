@@ -184,7 +184,7 @@ router.patch('/events/:eventId/questions/:questionId', ensureUser, async functio
 
   if (action == 'like' && !req.user && computerId.startsWith('nobiri-')) return res.sendStatus(401)
 
-  if (!['like', 'unlike', 'pin', 'unpin'].includes(action)) return res.sendStatus(400)
+  if (!['like', 'unlike', 'pin', 'unpin', 'archive', 'unarchive'].includes(action)) return res.sendStatus(400)
 
   const userIds = await fetchUserIdsBySingularities({ sessionId, userId, computerId })
 
@@ -217,6 +217,17 @@ router.patch('/events/:eventId/questions/:questionId', ensureUser, async functio
       update = {
         $set: {
           'questions.$[question].isPinned': action == 'pin',
+        },
+      }
+      break
+
+    case 'archive':
+    case 'unarchive':
+      arrayFilters = [{ 'question._id': questionId }]
+
+      update = {
+        $set: {
+          'questions.$[question].isArchived': action == 'archive',
         },
       }
       break

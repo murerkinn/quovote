@@ -220,6 +220,15 @@ router.patch('/events/:eventId/questions/:questionId', ensureUser, async functio
         },
       }
       break
+
+    case 'archive':
+    case 'unarchive':
+      update = {
+        $set: {
+          'questions.$[question].isArchived': action == 'archive',
+        },
+      }
+      break
   }
 
   const event = await Event.findOneAndUpdate(

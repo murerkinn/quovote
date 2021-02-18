@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex'
 import { notification, message } from 'ant-design-vue'
 import moment from 'moment'
-import Ugur from '../components/Ugur.vue'
+import Director from '../components/Director.vue'
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 const speechRecognitionInstance = new window.SpeechRecognition()
@@ -10,7 +10,7 @@ const speechRecognitionInstance = new window.SpeechRecognition()
 export default {
   name: 'event-detail',
   components: {
-    Ugur
+    Director
   },
   data() {
     return {
@@ -195,9 +195,9 @@ export default {
             )
             a-input(placeholder="Your name (optional)" v-model="name" :maxLength="40")
             a-button(type="primary" @click="sendQuestion" :loading="loading" icon="message") Send
-      a-tab-pane(tab="Ugurcum" key="2")
+      a-tab-pane(tab="Director" key="2")
         a-card
-          Ugur(:recognition="speechRecognitionInstance" :handlePin="pinLatestQuestion")
+          Director(:recognition="speechRecognitionInstance" :handlePin="pinLatestQuestion")
     a-card(v-else)
       form(@submit.prevent="sendQuestion")
         h2 Ask the speaker

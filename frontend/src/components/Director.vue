@@ -97,26 +97,26 @@ export default {
 </script>
 
 <template lang="pug">
-  #ugur
+  #director
     a-form(:form="form")
-      a-form-item.ugur-form-item(
+      a-form-item.director-form-item(
         v-for="(trigger, triggerIndex) in triggers"
         :key="triggerIndex"
       )
         a-input(v-decorator="[`names[${triggerIndex}]`,{validateTrigger: ['change', 'blur'],rules:[{message: 'some message'}]}]" @change="(e) => handleTriggerChange(triggerIndex, e.target.value)" style="width: 85%;")
-        a-button.ugur-action.left(@click="() => removeTrigger({index: triggerIndex})")
+        a-button.director-action.left(@click="() => removeTrigger({index: triggerIndex})")
           a-icon(type="minus")
-    a-button.ugur-action.first(@click="handleMoveOn") Done, move on
-    a-button.ugur-action(@click="handleVoiceActivation") Activate: Voice-Action
-    a-button.ugur-action(@click="addTrigger") Add new word
+    a-button.director-action.first(@click="handleMoveOn") Done, move on
+    a-button.director-action(@click="handleVoiceActivation") Activate: Voice-Action
+    a-button.director-action(@click="addTrigger") Add new word
 </template>
 
 <style>
-.ugur-action {
+.director-action {
   margin-left: 1rem;
 }
 
-.ugur-action.first {
+.director-action.first {
   margin: 0;
 }
 </style>

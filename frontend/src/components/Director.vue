@@ -1,34 +1,35 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
 export default {
   data() {
     return {
       triggers: [''],
-      lang: 'tr-TR'
+      lang: 'tr-TR',
+      speechRecognitionInstance: window.SpeechRecognition && new window.SpeechRecognition()
     }
   },
   computed: {
     ...mapState('event', ['event'])
   },
-  props: ['recognition', 'pinLatestQuestion'],
+  props: ['pinLatestQuestion'],
   methods: {
     ...mapActions('event', ['archiveQuestion']),
     handleVoiceActivation() {
-      const { recognition } = this
+      const { speechRecognitionInstance } = this
 
-      if (!recognition) return console.error('Your browser is not supporting speech recognition api')
-
-      recognition.lang = this.lang
+      speechRecognitionInstance.lang = this.lang
 
       try {
-        recognition.start()
+        speechRecognitionInstance.start()
       } catch (error) {
         console.warn('Speech recognition API is already started.')
       }
 
-      recognition.addEventListener('result', this.handleVoiceTrigger)
-      recognition.addEventListener('end', recognition.start)
+      speechRecognitionInstance.addEventListener('result', this.handleVoiceTrigger)
+      speechRecognitionInstance.addEventListener('end', speechRecognitionInstance.start)
     },
     handleMoveOn() {
       const getLastPinnedQuestion = () => this.event.questions?.find(question => question.isPinned)
@@ -64,10 +65,14 @@ export default {
     }
   },
   beforeDestroy() {
-    this.recognition.removeEventListener('result', this.handleVoiceTrigger)
-    this.recognition.removeEventListener('end', this.recognition.start)
+    const { speechRecognitionInstance } = this
 
-    this.recognition.stop()
+    if (!speechRecognitionInstance) return
+
+    speechRecognitionInstance.removeEventListener('result', this.handleVoiceTrigger)
+    speechRecognitionInstance.removeEventListener('end', speechRecognitionInstance.start)
+
+    speechRecognitionInstance.stop()
   }
 }
 </script>
@@ -81,7 +86,7 @@ export default {
     )
     #director-actions
       a-button.director-action.first(@click="handleMoveOn") Done, move on
-      a-button.director-action(@click="handleVoiceActivation") Activate: Voice-Action
+      a-button.director-action(@click="handleVoiceActivation" :disabled="!speechRecognitionInstance") Activate: Voice-Action
 </template>
 
 <style scoped>

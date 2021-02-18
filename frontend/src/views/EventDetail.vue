@@ -4,9 +4,6 @@ import { notification, message } from 'ant-design-vue'
 import moment from 'moment'
 import Director from '../components/Director.vue'
 
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-const speechRecognitionInstance = new window.SpeechRecognition()
-
 export default {
   name: 'event-detail',
   components: {
@@ -20,7 +17,6 @@ export default {
       sortBy: 'popular',
       orderBy: -1,
       questions: [],
-      speechRecognitionInstance
     }
   },
   async created() {
@@ -196,7 +192,7 @@ export default {
               a-input(placeholder="Your name (optional)" v-model="name" :maxLength="40")
               a-button(type="primary" @click="sendQuestion" :loading="loading" icon="message") Send
         a-tab-pane(tab="Director" key="2")
-            Director(:recognition="speechRecognitionInstance" :handlePin="pinLatestQuestion")
+            Director(:handlePin="pinLatestQuestion")
       form(v-else @submit.prevent="sendQuestion")
         h2 Ask the speaker
         a-textarea(

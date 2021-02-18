@@ -14,26 +14,6 @@ export default {
   props: ['recognition', 'pinLatestQuestion'],
   methods: {
     ...mapActions('event', ['archiveQuestion']),
-    addTrigger() {
-      const keys = this.form.getFieldValue('keys')
-
-      this.form.setFieldsValue({
-        keys: [...keys, keys.length++]
-      })
-
-      this.triggers = [...this.triggers, '']
-    },
-    removeTrigger({ index }) {
-      const keys = this.form.getFieldValue('keys')
-
-      if (!keys.length) return
-
-      this.form.setFieldsValue({
-        keys: keys.splice(index, 1)
-      })
-
-      this.triggers.splice(index, 1)
-    },
     handleVoiceActivation() {
       const { recognition } = this
 
@@ -83,10 +63,6 @@ export default {
       this.triggers.splice(triggerIndex, 1, value)
     }
   },
-  beforeCreate() {
-    this.form = this.$form.createForm(this, { name: 'dynamic_form_item' })
-    this.form.getFieldDecorator('keys', { initialValue: [], preserve: true })
-  },
   beforeDestroy() {
     this.recognition.removeEventListener('result', this.handleVoiceTrigger)
     this.recognition.removeEventListener('end', this.recognition.start)
@@ -98,20 +74,21 @@ export default {
 
 <template lang="pug">
   #director
-    a-form(:form="form")
-      a-form-item.director-form-item(
-        v-for="(trigger, triggerIndex) in triggers"
-        :key="triggerIndex"
-      )
-        a-input(v-decorator="[`names[${triggerIndex}]`,{validateTrigger: ['change', 'blur'],rules:[{message: 'some message'}]}]" @change="(e) => handleTriggerChange(triggerIndex, e.target.value)" style="width: 85%;")
-        a-button.director-action.left(@click="() => removeTrigger({index: triggerIndex})")
-          a-icon(type="minus")
-    a-button.director-action.first(@click="handleMoveOn") Done, move on
-    a-button.director-action(@click="handleVoiceActivation") Activate: Voice-Action
-    a-button.director-action(@click="addTrigger") Add new word
+    a-textarea(
+      placeholder='Enter trigger phrases (each line represents a trigger)'
+      :autoSize='{ minRows: 5 }'
+      @input="handleTextArea"
+    )
+    #director-actions
+      a-button.director-action.first(@click="handleMoveOn") Done, move on
+      a-button.director-action(@click="handleVoiceActivation") Activate: Voice-Action
 </template>
 
-<style>
+<style scoped>
+#director-actions {
+  margin-top: 1.5rem;
+}
+
 .director-action {
   margin-left: 1rem;
 }

@@ -182,24 +182,22 @@ export default {
   .content
     h1 {{ event.title }}
     h3 {{ event.description }}
-    a-tabs(v-if="event.owner == user._id")
-      a-tab-pane(tab="Ask the speaker" key="1")
-        a-card
-          form(@submit.prevent="sendQuestion")
-            h2 Ask the speaker
-            a-textarea(
-              placeholder="Type your question"
-              :autoSize="{ minRows: 2, maxRows: 6 }"
-              :maxLength="280"
-              v-model="question"
-            )
-            a-input(placeholder="Your name (optional)" v-model="name" :maxLength="40")
-            a-button(type="primary" @click="sendQuestion" :loading="loading" icon="message") Send
-      a-tab-pane(tab="Director" key="2")
-        a-card
-          Director(:recognition="speechRecognitionInstance" :handlePin="pinLatestQuestion")
-    a-card(v-else)
-      form(@submit.prevent="sendQuestion")
+    a-card
+      a-tabs(v-if="event.owner == user._id")
+        a-tab-pane(tab="Ask the speaker" key="1")
+            form(@submit.prevent="sendQuestion")
+              h2 Ask the speaker
+              a-textarea(
+                placeholder="Type your question"
+                :autoSize="{ minRows: 2, maxRows: 6 }"
+                :maxLength="280"
+                v-model="question"
+              )
+              a-input(placeholder="Your name (optional)" v-model="name" :maxLength="40")
+              a-button(type="primary" @click="sendQuestion" :loading="loading" icon="message") Send
+        a-tab-pane(tab="Director" key="2")
+            Director(:recognition="speechRecognitionInstance" :handlePin="pinLatestQuestion")
+      form(v-else @submit.prevent="sendQuestion")
         h2 Ask the speaker
         a-textarea(
           placeholder='Type your question',

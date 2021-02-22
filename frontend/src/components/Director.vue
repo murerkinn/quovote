@@ -7,12 +7,12 @@ export default {
   data() {
     return {
       triggers: [''],
-      lang: 'tr-TR',
       speechRecognitionInstance: window.SpeechRecognition && new window.SpeechRecognition()
     }
   },
   computed: {
-    ...mapState('event', ['event'])
+    ...mapState('event', ['event']),
+    ...mapState('account', ['user'])
   },
   props: ['pinLatestQuestion'],
   methods: {
@@ -20,7 +20,7 @@ export default {
     handleVoiceActivation() {
       const { speechRecognitionInstance } = this
 
-      speechRecognitionInstance.lang = this.lang
+      speechRecognitionInstance.lang = this.user.directorLanguage
 
       try {
         speechRecognitionInstance.start()

@@ -17,7 +17,7 @@ export default {
   props: ['pinLatestQuestion'],
   methods: {
     ...mapActions('event', ['archiveQuestion']),
-    handleVoiceActivation() {
+    activateVoiceRecognition() {
       const { speechRecognitionInstance } = this
 
       speechRecognitionInstance.lang = this.user.directorLanguage
@@ -86,7 +86,7 @@ export default {
     )
     #director-actions
       a-button.director-action.first(@click="handleMoveOn") Done, move on
-      a-button.director-action(@click="handleVoiceActivation" :disabled="!speechRecognitionInstance") Activate: Voice-Action
+      a-button.director-action(@click="activateVoiceRecognition" :disabled="!speechRecognitionInstance") Activate: Voice-Action
 </template>
 
 <style scoped>

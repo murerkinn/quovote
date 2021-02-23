@@ -31,7 +31,7 @@ export default {
       speechRecognitionInstance.addEventListener('result', this.handleVoiceTrigger)
       speechRecognitionInstance.addEventListener('end', speechRecognitionInstance.start)
     },
-    handleMoveOn() {
+    skipQuestion() {
       const getLastPinnedQuestion = () => this.event.questions?.find(question => question.isPinned)
 
       if (!getLastPinnedQuestion()) return
@@ -55,7 +55,7 @@ export default {
 
       const isTriggered = this.triggers.some(trigger => trigger && transcript.includes(trigger))
 
-      if (isTriggered) this.handleMoveOn()
+      if (isTriggered) this.skipQuestion()
     },
     handleTextArea(e) {
       this.triggers = e.target.value.split('\n').filter(v => v)
@@ -85,7 +85,7 @@ export default {
       @input="handleTextArea"
     )
     #director-actions
-      a-button.director-action.first(@click="handleMoveOn") Done, move on
+      a-button.director-action.first(@click="skipQuestion") Done, move on
       a-button.director-action(@click="activateVoiceRecognition" :disabled="!speechRecognitionInstance") Activate: Voice-Action
 </template>
 

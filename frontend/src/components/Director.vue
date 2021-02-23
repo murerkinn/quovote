@@ -6,7 +6,7 @@ window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogn
 export default {
   data() {
     return {
-      triggers: [''],
+      triggers: '',
       speechRecognitionInstance: window.SpeechRecognition && new window.SpeechRecognition()
     }
   },
@@ -17,15 +17,17 @@ export default {
   props: ['pinLatestQuestion'],
   methods: {
     ...mapActions('event', ['archiveQuestion']),
+    ...mapActions('account', ['updateDirector']),
     activateVoiceRecognition() {
       const { speechRecognitionInstance } = this
 
-      speechRecognitionInstance.lang = this.user.directorLanguage
+      speechRecognitionInstance.lang = this.user.director.language
 
       try {
         speechRecognitionInstance.start()
       } catch (error) {
-        console.warn('Speech recognition API is already started.')
+        if (error.name == 'InvalidStateError') console.warn('Speech recognition API is already started.')
+        else console.warn(error)
       }
 
       speechRecognitionInstance.addEventListener('result', this.handleVoiceTrigger)
@@ -53,16 +55,15 @@ export default {
         .replace(new RegExp(/ı|I|İ/g), 'i')
         .toLowerCase()
 
-      const isTriggered = this.triggers.some(trigger => trigger && transcript.includes(trigger))
+      const isTriggered = this.triggers
+        .split('\n')
+        .some(trigger => trigger && transcript.includes(trigger))
 
       if (isTriggered) this.skipQuestion()
     },
-    handleTextArea(e) {
-      this.triggers = e.target.value.split('\n').filter(v => v)
-    },
-    handleTriggerChange(triggerIndex, value) {
-      this.triggers.splice(triggerIndex, 1, value)
-    }
+  },
+  mounted() {
+    this.triggers = this.user.director.triggers.join('\n')
   },
   beforeDestroy() {
     const { speechRecognitionInstance } = this
@@ -73,7 +74,17 @@ export default {
     speechRecognitionInstance.removeEventListener('end', speechRecognitionInstance.start)
 
     speechRecognitionInstance.stop()
-  }
+  },
+  watch: {
+    triggers(newTriggers, oldTriggers) {
+      const director = {
+        triggers: newTriggers.split('\n').filter(t => t),
+        language: this.user.director.language,
+      }
+
+      this.updateDirector(director)
+    }
+  },
 }
 </script>
 
@@ -82,7 +93,7 @@ export default {
     a-textarea(
       placeholder='Enter trigger phrases (each line represents a trigger)'
       :autoSize='{ minRows: 5 }'
-      @input="handleTextArea"
+      v-model="triggers"
     )
     #director-actions
       a-button.director-action.first(@click="skipQuestion") Done, move on

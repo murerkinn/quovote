@@ -3,35 +3,10 @@ const router = express.Router()
 const Event = require('../models/event')
 const Singularity = require('../models/singularity')
 const socketServer = require('../socket-connection')
-const ensureSingularity = require('../lib/ensureSingularity')
 const ObjectId = require('mongoose').Types.ObjectId
-const { v4: uuid } = require('uuid')
 const { celebrate, Joi, Segments } = require('celebrate')
 const sanitize = require('express-mongo-sanitize').sanitize;
-
-async function ensureUser(req, res, next) {
-  if (req.body.computerId) req.session.computerId = req.body.computerId
-  else {
-    req.session.computerId = req.session.computerId || `nobiri-${uuid()}`
-  }
-
-  if (!req.session.userId) {
-    if (req.user) req.session.userId = req.user._id
-    else {
-      req.session.userId = ObjectId()
-
-      await req.session.save()
-    }
-  }
-
-  await ensureSingularity({
-    userId: req.session.userId,
-    sessionId: req.session.id,
-    computerId: req.session.computerId,
-  })
-
-  next()
-}
+const ensureUser = require('../lib/ensureUser')
 
 async function fetchUserIdsBySingularities({ sessionId, userId, computerId }) {
   return Singularity.find({

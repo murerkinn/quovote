@@ -87,7 +87,7 @@ const event = {
     async [actions.ARCHIVE_QUESTION]({ dispatch }, { questionId, action }) {
       await dispatch(actions.PATCH_QUESTION, { questionId, action })
     },
-    async [actions.WITHDRAW_QUESTION]({ state }, questionId) {
+    async [actions.WITHDRAW_QUESTION]({ state, dispatch }, questionId) {
       await axios.delete(`/events/${state.eventId}/questions/${questionId}`)
       await dispatch(actions.FETCH_EVENT)
     },

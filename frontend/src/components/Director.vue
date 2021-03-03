@@ -49,8 +49,7 @@ export default {
     },
     handleVoiceTrigger(e) {
       const transcript = Array.from(e.results)
-        .map(result => result[0])
-        .map(result => result.transcript)
+        .map(result => result[0].transcript)
         .join('')
         .replace(new RegExp(/ı|I|İ/g), 'i')
         .toLowerCase()

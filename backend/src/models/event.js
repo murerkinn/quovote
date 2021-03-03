@@ -57,11 +57,11 @@ Event.pre('save', async function (next) {
   next()
 })
 
-Event.static('decorateForUser', function (event, userIds) {
+Event.static('decorateForUser', function (event, userIds, isEventOwner) {
   const updatedQuestions = event
     .questions
     .toObject()
-    .filter(q => !q.isArchived)
+    .filter(q => isEventOwner ? q : !q.isArchived)
     .map(q => {
       return {
         ...q,

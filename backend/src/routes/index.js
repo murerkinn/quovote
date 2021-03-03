@@ -101,8 +101,9 @@ router.post('/events', ensureUser, ensureLogin, eventsValidator, async function 
 router.get('/events/:eventId', ensureUser, async (req, res, next) => {
   const { id: sessionId, userId, computerId } = req.session
   const userIds = await fetchUserIdsBySingularities({ sessionId, userId, computerId })
+  const isEventOwner = req.user?._id.equals(req.event.owner)
 
-  res.send(Event.decorateForUser(req.event, userIds))
+  res.send(Event.decorateForUser(req.event, userIds, isEventOwner))
 })
 
 const questionsValidator = celebrate({

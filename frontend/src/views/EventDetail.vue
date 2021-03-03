@@ -179,7 +179,7 @@ export default {
     h1 {{ event.title }}
     h3 {{ event.description }}
     a-card
-      a-tabs(v-if="event.owner == user._id")
+      a-tabs(v-if="event.owner == user._id" :default-active-key="event.owner == user._id ? '1' : '2'")
         a-tab-pane(tab="Ask the speaker" key="1")
             form(@submit.prevent="sendQuestion")
               h2 Ask the speaker

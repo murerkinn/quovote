@@ -3,20 +3,21 @@ import { mapState, mapActions } from 'vuex'
 import { notification, message } from 'ant-design-vue'
 import moment from 'moment'
 import Director from '../components/Director.vue'
+import AskTheSpeakerForm from '../components/AskTheSpeakerForm.vue'
 
 export default {
   name: 'event-detail',
   components: {
-    Director
+    Director,
+    AskTheSpeakerForm
   },
   data() {
     return {
-      question: '',
-      name: undefined,
       moment,
       sortBy: 'popular',
       orderBy: -1,
       questions: [],
+      showArchivedQuestions: false
     }
   },
   async created() {
@@ -41,9 +42,9 @@ export default {
       'pinQuestion',
       'archiveQuestion'
     ]),
-    async sendQuestion() {
+    async sendQuestion({ question, name }) {
       try {
-        await this.submitQuestion({ question: this.question, name: this.name })
+        await this.submitQuestion({ question, name })
 
         message.success('Question added 🎉')
 
@@ -168,6 +169,11 @@ export default {
 
       this.questions = questions.slice()
       this.sortQuestions()
+    },
+    showArchivedQuestions(val) {
+      this.questions = this.event.questions.filter(q => val ? q.isArchived : q)
+
+      this.sortQuestions()
     }
   }
 }
@@ -181,28 +187,10 @@ export default {
     a-card
       a-tabs(v-if="event.owner == user._id" :default-active-key="event.owner == user._id ? '1' : '2'")
         a-tab-pane(tab="Ask the speaker" key="1")
-            form(@submit.prevent="sendQuestion")
-              h2 Ask the speaker
-              a-textarea(
-                placeholder="Type your question"
-                :autoSize="{ minRows: 2, maxRows: 6 }"
-                :maxLength="280"
-                v-model="question"
-              )
-              a-input(placeholder="Your name (optional)" v-model="name" :maxLength="40")
-              a-button(type="primary" @click="sendQuestion" :loading="loading" icon="message") Send
+          ask-the-speaker-form(:loading='loading', @sendQuestion='sendQuestion($event)')
         a-tab-pane(tab="Director" key="2")
-            Director(:handlePin="pinLatestQuestion")
-      form(v-else @submit.prevent="sendQuestion")
-        h2 Ask the speaker
-        a-textarea(
-          placeholder='Type your question',
-          :autoSize='{ minRows: 2, maxRows: 6 }',
-          :maxLength='280',
-          v-model='question'
-        )
-        a-input(placeholder='Your name (optional)', v-model='name', :maxLength='40')
-        a-button(type='primary', @click='sendQuestion', :loading='loading', icon='message') Send
+          Director(:handlePin="pinLatestQuestion")
+      ask-the-speaker-form(v-else :loading='loading', @sendQuestion='sendQuestion($event)')
     a-card
       .questions
         .questions-header
@@ -210,11 +198,15 @@ export default {
             a-avatar.question-count {{ questions.length }}
           .sort-container
             div(v-if='questions.length')
-              span Sort questions by &nbsp;
-              a-radio-group(size='small', defaultValue='popular', buttonStyle='solid', :value='sortBy')
-                a-radio-button(value='popular', @click='updateSorting') Popular {{ popularSortOrderIndicator }}
-                a-radio-button(value='recent', @click='updateSorting') Recent {{ recentSortOrderIndicator }}
-                a-radio-button(value='random', @click='updateSorting') Random {{ randomSortOrderIndicator }}
+              div(v-if='event.owner == user._id')
+                span(style='margin-right: 0.4em') Archived
+                a-switch(size='small' v-model='showArchivedQuestions')
+              div
+                span Sort questions by &nbsp;
+                a-radio-group(size='small', defaultValue='popular', buttonStyle='solid', :value='sortBy')
+                  a-radio-button(value='popular', @click='updateSorting') Popular {{ popularSortOrderIndicator }}
+                  a-radio-button(value='recent', @click='updateSorting') Recent {{ recentSortOrderIndicator }}
+                  a-radio-button(value='random', @click='updateSorting') Random {{ randomSortOrderIndicator }}
         .questions-container
           p.no-questions(v-if='!questions.length') This event has no questions, be the first one and ask the first question!
           a-card(v-for='question in questions', :key='question._id', :bordered='false')
@@ -331,14 +323,6 @@ export default {
 
 .ant-card {
   margin: 24px 0;
-}
-
-form > * {
-  margin: 8px 0 !important;
-}
-
-textarea {
-  padding: 8px;
 }
 
 .avatar-bg-0 {
